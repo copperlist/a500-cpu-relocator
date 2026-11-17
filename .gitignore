@@ -25,3 +25,8 @@ fp-info-cache
 gerbers/
 *.zip
 68000Relocator-backups
+
+# CPU-01 production files are kept in the repo
+!cpu01/gerbers/
+!cpu01/jlc/*.csv
+!cpu01/jlc/*.zip
