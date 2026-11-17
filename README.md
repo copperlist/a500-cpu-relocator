@@ -27,7 +27,8 @@ Like the original, CPU-01 is open hardware under the GNU GPL v3 (see [LICENSE](L
      straight, which makes A11 about 0.16 mm shorter (about 1 ps, negligible).
    - Four dead-end track stubs (D1, DTACK, BG, BERR, 0.2 to 1.1 mm long) are removed. No connection changes.
    - No silkscreen over pads.
-4. **CopperList markings on the underside:** bare-copper CopperList wordmark, copperlist.com, part number and
+4. **CopperList markings on the underside:** bare-copper CopperList wordmark (letters exposed, their counters
+   copper under the mask so they match the pour), copperlist.com, part number and
    version (CPU-01 v0.1), and the licence. LinuxJedi's own text and logos on the top are kept.
 
 The board file is now in KiCad 7 format (upstream was KiCad 6 / 5.99).

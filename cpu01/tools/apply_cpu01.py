@@ -295,8 +295,10 @@ def to_boxes(rects, f):
 
 MARK_RECTS = to_boxes(raster_rects(rings_of(MARK)), mark_xy)
 LOGO_SHAPE = unary_union([box(a, c, b_, d) for a, b_, c, d in MARK_RECTS])
-# bare copper: one footprint (LOGO1, kept in the project library) whose custom pads are the wordmark's
-# pixel-run rectangles on B.Cu with matching solder-mask openings. Letters that touch share a pad.
+# The wordmark: one footprint (LOGO1, kept in the project library) whose custom pads are the letters on B.Cu,
+# each filled solid, so the counters of o, p, e have copper under the mask and match the pour around them.
+# The solder-mask openings (board graphics on B.Mask) are the letters only, so just the letters come out bare
+# (silver with HASL). Letters that touch share a pad.
 LC = LOGO_SHAPE.centroid
 logo_fp = pcbnew.FOOTPRINT(board)
 logo_fp.SetFPID(pcbnew.LIB_ID("Open68000Relocator", "CopperList_Wordmark_CPU01"))
@@ -304,27 +306,27 @@ logo_fp.SetReference("LOGO1"); logo_fp.SetValue("CopperList wordmark")
 logo_fp.SetAttributes(pcbnew.FP_EXCLUDE_FROM_POS_FILES | pcbnew.FP_EXCLUDE_FROM_BOM | pcbnew.FP_BOARD_ONLY)
 logo_fp.Reference().SetVisible(False); logo_fp.Value().SetVisible(False)
 logo_fp.Reference().SetLayer(pcbnew.B_Fab); logo_fp.Value().SetLayer(pcbnew.B_Fab)
-_lset = pcbnew.LSET(); _lset.AddLayer(pcbnew.B_Cu); _lset.AddLayer(pcbnew.B_Mask)
+_lset = pcbnew.LSET(); _lset.AddLayer(pcbnew.B_Cu)
 _groups = LOGO_SHAPE.buffer(0.01, join_style=2)
 for comp in getattr(_groups, "geoms", [_groups]):
-    rects = [r for r in MARK_RECTS if box(r[0], r[2], r[1], r[3]).intersects(comp)]
-    a = rects[0]
-    ax, ay = (a[0] + a[1]) / 2, (a[2] + a[3]) / 2
+    solid = Polygon(comp.exterior)               # the letter(s), 0.01 mm grown, with counters filled in
+    c = solid.representative_point()
     pad = pcbnew.PAD(logo_fp)
     pad.SetAttribute(pcbnew.PAD_ATTRIB_SMD)
     pad.SetShape(pcbnew.PAD_SHAPE_CUSTOM)
-    pad.SetAnchorPadShape(pcbnew.PAD_SHAPE_RECT)
-    pad.SetSize(pcbnew.VECTOR2I(MM(0.1), MM(0.1)))
+    pad.SetAnchorPadShape(pcbnew.PAD_SHAPE_CIRCLE)
+    pad.SetSize(pcbnew.VECTOR2I(MM(0.05), MM(0.05)))
     pad.SetLayerSet(_lset)
     pad.SetNumber("")
-    pad.SetPos0(V(ax - LC.x, ay - LC.y))
-    pad.SetPosition(V(ax - LC.x, ay - LC.y))
+    pad.SetPos0(V(c.x - LC.x, c.y - LC.y))
+    pad.SetPosition(V(c.x - LC.x, c.y - LC.y))
     logo_fp.Add(pad)
-    for x0, x1, y0, y1 in rects:
-        pts = pcbnew.VECTOR_VECTOR2I()
-        for x, y in ((x0, y0), (x1, y0), (x1, y1), (x0, y1)):
-            pts.append(V(x - ax, y - ay))
-        pad.AddPrimitivePoly(pts, 0, True)
+    pts = pcbnew.VECTOR_VECTOR2I()
+    for x, y in list(solid.exterior.coords)[:-1]:
+        pts.append(V(x - c.x, y - c.y))
+    pad.AddPrimitivePoly(pts, 0, True)
+for x0, x1, y0, y1 in MARK_RECTS:              # mask openings: the letters only
+    poly(box(x0, y0, x1, y1), pcbnew.B_Mask)
 LOGO_LIB_COPY = pcbnew.FOOTPRINT(logo_fp)    # at the origin, for the project library
 board.Add(logo_fp)
 logo_fp.SetPosition(V(LC.x, LC.y))
