@@ -29,8 +29,12 @@ with open(OUT / f"{NAME}_CPL.csv", "w", newline="") as f:
     w = csv.writer(f)
     w.writerow(["Designator", "Mid X", "Mid Y", "Layer", "Rotation"])
     for r in rows:
+        rot = float(r["Rot"])
+        if r["Side"] == "bottom":
+            # JLC views underside parts mirrored, so its angle runs the other way: 180 - KiCad's angle
+            rot = 180 - rot
         w.writerow([r["Ref"], f"{float(r['PosX']):.4f}mm", f"{float(r['PosY']):.4f}mm",
-                    "Bottom" if r["Side"] == "bottom" else "Top", f"{float(r['Rot']) % 360:.1f}"])
+                    "Bottom" if r["Side"] == "bottom" else "Top", f"{rot % 360:.1f}"])
 with open(OUT / f"{NAME}_BOM.csv", "w", newline="") as f:
     w = csv.writer(f)
     w.writerow(["Comment", "Designator", "Footprint", "LCSC Part #"])
