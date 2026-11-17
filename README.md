@@ -47,8 +47,8 @@ Files are in [`cpu01/jlc/`](cpu01/jlc): `CPU-01_v0.1_gerbers.zip`, plus `CPU-01_
 | Ref | Part | Notes |
 | --- | --- | --- |
 | C1, C2 | 100 nF 50 V X7R, 0805 | LCSC C49678 (JLC basic part). Underside. |
-| U1 | 2 x 32 round machined (turned) pin strips, 0.9" row spacing | Underneath, into the motherboard's CPU socket |
-| U2 | 64-pin 0.9" DIP socket, or 2 x 32 machined pin strips | On top, for the 68000 |
+| U1 | 2 x 32 round machined (turned) male pin strips, 0.9" row spacing | Underneath, into the motherboard's CPU socket. LCSC C9742 (BOOMELE 2.54-1*40P, 1x40 round pin, gold): two per board, cut to 32. |
+| U2 | 2 x 32 round-hole machined female strips (or a 64-pin 0.9" DIP socket) | On top, for the 68000 or accelerator. LCSC C7495233 (CONNFLY DS1002-01-1x40V13-JK, 1x40): two per board, cut to 32. |
 
 Holes for the pins are 0.8 mm.
 
